@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="opc-ua-client-reader-wfa/opc-ua-client-reader-wfa.csproj" Id="26d0c567-4fa1-4004-b7f9-0a9df558ed90" />
+  <Project Path="Scada-opc-client-DB-writer/Scada-opc-client-DB-writer.csproj" Id="2c41ca15-6301-4f5c-904c-95494492d5c1" />
+</Solution>

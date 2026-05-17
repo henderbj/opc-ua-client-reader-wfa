@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>Scada_opc_client_DB_writer</RootNamespace>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Opc.UaFx.Client" Version="2.53.1" />
+    <PackageReference Include="ScottPlot.WinForms" Version="5.1.58" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.0-preview1.26124.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Classes\ConfigForm_Sensor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Classes\ConfigForm_SensorType.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Classes\ConfigForm_ProcessVariable.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Classes\ConfigForm_ProcessUnit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+
+</Project>
