@@ -13,6 +13,7 @@ namespace Scada_opc_client_DB_writer
         private string tagName;
         private string opcServer;
         private System.Windows.Forms.Timer timer;
+        private int sensorId;
 
         public Form1(ConfigData config)
         {
@@ -23,6 +24,7 @@ namespace Scada_opc_client_DB_writer
 
             InitializeComponent();
 
+            sensorId = config.sensor.SensorId;
             tagName = string.IsNullOrEmpty(config.tagName) ? "" : config.tagName;
             opcServer = string.IsNullOrEmpty(config.opcServer) ? "" : config.opcServer;
 
@@ -70,6 +72,7 @@ namespace Scada_opc_client_DB_writer
 
         private void Timer_Tick(object sender, EventArgs e)
         {
+            SensorData sensorData = new SensorData();
             try
             {
                 var node = opcClient.ReadNode(tagName);
@@ -81,6 +84,9 @@ namespace Scada_opc_client_DB_writer
                 //Plot Data
                 Logger.Add(processValue);
                 formsPlot1.Refresh();
+
+                // Write to DB
+                sensorData.Insert(sensorId, (float)processValue, Convert.ToDateTime(timestamp));
             }
             catch (Exception ex)
             {
