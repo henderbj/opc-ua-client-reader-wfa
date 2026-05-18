@@ -21,5 +21,11 @@ namespace Scada_opc_client_DB_writer
             PopulateSensorType();
             PopulateSensor();
         }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            Location location = new Location();
+            location = location.FindOrCreate(txtLocationName.Text, txtBuilding.Text, Convert.ToInt32(txtFloor.Text), txtRoom.Text);
+        }
     }
 }

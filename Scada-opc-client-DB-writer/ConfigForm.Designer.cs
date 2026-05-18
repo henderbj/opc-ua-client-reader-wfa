@@ -90,6 +90,7 @@
             txtLocationName = new TextBox();
             cmbLocation = new ComboBox();
             label23 = new Label();
+            btnCancel = new Button();
             groupBoxProcessUnit.SuspendLayout();
             groupBoxProcessVariable.SuspendLayout();
             groupBoxSensorType.SuspendLayout();
@@ -187,12 +188,13 @@
             // 
             // btnSave
             // 
-            btnSave.Location = new Point(1061, 476);
+            btnSave.Location = new Point(1154, 529);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(114, 31);
             btnSave.TabIndex = 35;
             btnSave.Text = "Save";
             btnSave.UseVisualStyleBackColor = true;
+            btnSave.Click += btnSave_Click;
             // 
             // groupBoxProcessUnit
             // 
@@ -646,11 +648,21 @@
             label23.TabIndex = 56;
             label23.Text = "Location:";
             // 
+            // btnCancel
+            // 
+            btnCancel.Location = new Point(990, 529);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(114, 31);
+            btnCancel.TabIndex = 59;
+            btnCancel.Text = "Cancel";
+            btnCancel.UseVisualStyleBackColor = true;
+            // 
             // ConfigForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1330, 721);
+            Controls.Add(btnCancel);
             Controls.Add(groupBox1);
             Controls.Add(cmbLocation);
             Controls.Add(label23);
@@ -751,5 +763,6 @@
         private Label label23;
         private Label label3;
         private TextBox txtSensorName;
+        private Button btnCancel;
     }
             }
