@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Scada_opc_client_DB_writer;
+using System.Data;
 
 namespace Scada_opc_client_DB_writer.Classes
 {
@@ -40,6 +41,42 @@ namespace Scada_opc_client_DB_writer.Classes
                 }
             }
             return sensorList;
+        }
+
+        public Sensor FindOrCreate(int VariableId, int SensorTypeId, string SensorName, string Manufacturer, string Model, string SerialNumber, DateTime InstallationDate)
+        {
+            Sensor sensor = new Sensor();
+            SqlConnection con = new SqlConnection(connectionString);
+            SensorName = SensorName.Trim();
+            Manufacturer = Manufacturer.Trim();
+            Model = Model.Trim();
+            SerialNumber = SerialNumber.Trim();
+            var cmd = new SqlCommand("usp_FindOrCreateSensor", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@VariableId", VariableId);
+            cmd.Parameters.AddWithValue("@SensorTypeId", SensorTypeId);
+            cmd.Parameters.AddWithValue("@SensorName", SensorName);
+            cmd.Parameters.AddWithValue("@Manufacturer", Manufacturer);
+            cmd.Parameters.AddWithValue("@Model", Model);
+            cmd.Parameters.AddWithValue("@SerialNumber", SerialNumber);
+            cmd.Parameters.AddWithValue("@InstallationDate", InstallationDate);
+            con.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr != null)
+            {
+                while (dr.Read())
+                {
+                    sensor.SensorId = Convert.ToInt32(dr["SensorId"]);
+                    sensor.VariableId = Convert.ToInt32(dr["VariableId"]);
+                    sensor.SensorTypeId = Convert.ToInt32(dr["SensorTypeId"]);
+                    sensor.SensorName = dr["SensorName"].ToString();
+                    sensor.Manufacturer = dr["Manufacturer"].ToString();
+                    sensor.Model = dr["Model"].ToString();
+                    sensor.SerialNumber = dr["SerialNumber"].ToString();
+                    sensor.InstallationDate = Convert.ToDateTime(dr["InstallationDate"]);
+                }
+            }
+            return sensor;
         }
     }
 }

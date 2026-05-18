@@ -1,6 +1,6 @@
 USE [master]
 GO
-/****** Object:  Database [SCADA]    Script Date: 18.05.2026 14:21:55 ******/
+/****** Object:  Database [SCADA]    Script Date: 18.05.2026 14:40:06 ******/
 CREATE DATABASE [SCADA]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -82,7 +82,7 @@ ALTER DATABASE [SCADA] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POL
 GO
 USE [SCADA]
 GO
-/****** Object:  Table [dbo].[Location]    Script Date: 18.05.2026 14:21:55 ******/
+/****** Object:  Table [dbo].[Location]    Script Date: 18.05.2026 14:40:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -109,7 +109,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ProcessUnit]    Script Date: 18.05.2026 14:21:55 ******/
+/****** Object:  Table [dbo].[ProcessUnit]    Script Date: 18.05.2026 14:40:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -126,7 +126,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ProcessVariable]    Script Date: 18.05.2026 14:21:55 ******/
+/****** Object:  Table [dbo].[ProcessVariable]    Script Date: 18.05.2026 14:40:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -147,7 +147,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Sensor]    Script Date: 18.05.2026 14:21:55 ******/
+/****** Object:  Table [dbo].[Sensor]    Script Date: 18.05.2026 14:40:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -167,7 +167,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SensorData]    Script Date: 18.05.2026 14:21:55 ******/
+/****** Object:  Table [dbo].[SensorData]    Script Date: 18.05.2026 14:40:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -183,7 +183,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SensorType]    Script Date: 18.05.2026 14:21:55 ******/
+/****** Object:  Table [dbo].[SensorType]    Script Date: 18.05.2026 14:40:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -208,7 +208,7 @@ REFERENCES [dbo].[ProcessUnit] ([ProcessID])
 GO
 ALTER TABLE [dbo].[ProcessVariable] CHECK CONSTRAINT [FK_ProcessVariable_ProcessUnit]
 GO
-/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateLocation]    Script Date: 18.05.2026 14:21:55 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateLocation]    Script Date: 18.05.2026 14:40:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -241,7 +241,7 @@ BEGIN
     OUTPUT inserted.*;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateProcessUnit]    Script Date: 18.05.2026 14:21:55 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateProcessUnit]    Script Date: 18.05.2026 14:40:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -275,7 +275,7 @@ BEGIN
     OUTPUT inserted.*;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateProcessVariable]    Script Date: 18.05.2026 14:21:55 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateProcessVariable]    Script Date: 18.05.2026 14:40:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -310,7 +310,47 @@ BEGIN
     OUTPUT inserted.*;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateSensorType]    Script Date: 18.05.2026 14:21:55 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateSensor]    Script Date: 18.05.2026 14:40:06 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+CREATE PROCEDURE [dbo].[usp_FindOrCreateSensor]
+    @VariableID INT,
+    @SensorTypeID INT,
+    @SensorName VARCHAR(50),
+    @Manufacturer VARCHAR(100),
+    @Model VARCHAR(50),
+    @SerialNumber VARCHAR(100),
+    @InstallationDate DATETIME
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    MERGE INTO Sensor AS target
+    USING (VALUES (@VariableID, @SensorTypeID, @SensorName, @Manufacturer, @Model, @SerialNumber, @InstallationDate))
+           AS source(VariableID, SensorTypeID, SensorName, Manufacturer, Model, SerialNumber, InstallationDate)
+    ON 
+        target.VariableID = source.VariableID
+       AND target.SensorTypeID = source.SensorTypeID
+       AND target.SensorName = source.SensorName
+       AND target.Manufacturer = source.Manufacturer
+       AND target.Model = source.Model
+       AND target.SerialNumber = source.SerialNumber
+       AND target.InstallationDate = source.InstallationDate
+    WHEN MATCHED THEN
+        -- No-op update to force OUTPUT to return the existing row
+        UPDATE SET SensorName = target.SensorName
+    WHEN NOT MATCHED THEN
+        INSERT (VariableID, SensorTypeID, SensorName, Manufacturer, Model, SerialNumber, InstallationDate)
+        VALUES (source.VariableID, source.SensorTypeID, source.SensorName, source.Manufacturer, source.Model, source.SerialNumber, source.InstallationDate)
+    OUTPUT inserted.*;
+END
+GO
+/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateSensorType]    Script Date: 18.05.2026 14:40:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

@@ -32,6 +32,8 @@ namespace Scada_opc_client_DB_writer
             processVariable = processVariable.FindOrCreate(processUnit.ProcessId, txtVariableName.Text, txtEngineeringUnit.Text, txtVariableDescription.Text);
             SensorType sensorType = new SensorType();
             sensorType = sensorType.FindOrCreate(txtSensorTypeName.Text, txtSensorTypeDescription.Text);
+            Sensor sensor = new Sensor();
+            sensor = sensor.FindOrCreate(processVariable.VariableId, sensorType.SensorTypeId, txtSensorName.Text, txtSensorManufacturer.Text, txtSensorModel.Text, txtSensorSerial.Text, Convert.ToDateTime(txtSensorInstallDate.Text));
         }
     }
 }
