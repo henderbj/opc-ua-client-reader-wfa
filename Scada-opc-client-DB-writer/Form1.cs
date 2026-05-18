@@ -1,6 +1,5 @@
 using Opc.UaFx.Client;
 using Scada_opc_client_DB_writer.Classes;
-//using System.Timers;
 
 namespace Scada_opc_client_DB_writer
 {
@@ -14,10 +13,14 @@ namespace Scada_opc_client_DB_writer
         private string tagName;
         private string opcServer;
         private System.Windows.Forms.Timer timer;
-        public Form1() : this(null) { }
 
         public Form1(ConfigData config)
         {
+            if (config is null)
+            {
+                return;
+            }
+
             InitializeComponent();
 
             tagName = string.IsNullOrEmpty(config.tagName) ? "" : config.tagName;
@@ -26,25 +29,31 @@ namespace Scada_opc_client_DB_writer
             // create one logger and add them to the plot
             Logger = formsPlot1.Plot.Add.DataLogger();
             //Set axis labels
-            formsPlot1.Plot.YLabel("Process Value");
+            formsPlot1.Plot.YLabel(config.processVariable.VariableName);
             formsPlot1.Plot.XLabel("Sample number");
             formsPlot1.Refresh();
 
-            Text = "OPC UA Temperature Reader";
-            Size = new Size(700, 400);
+            Text = "OPC UA Sensor Reader and DB Writer";
+            Size = new Size(1024, 768);
 
             // Label
             lblTemp = new Label
             {
-                Location = new Point(10, 400),
+                Location = new Point(10, 600),
                 Size = new Size(600, 20),
-                Text = "Temperature: "
+                Text = "Press Start to begin data acquisition"
             };
             Controls.Add(lblTemp);
 
-            // Set textbox values if provided
+            // Set textbox values as provided by config to inform about the current configuration
             txtTagName.Text = tagName;
             txtOpcServer.Text = opcServer;
+            txtLocation.Text = string.IsNullOrEmpty(config.location.LocationName) ? "" : config.location.LocationName;
+            txtProcessUnit.Text = string.IsNullOrEmpty(config.processUnit.ProcessName) ? "" : config.processUnit.ProcessName;
+            txtProcessVariable.Text = string.IsNullOrEmpty(config.processVariable.VariableName) ? "" : config.processVariable.VariableName;
+            txtSensor.Text = string.IsNullOrEmpty(config.sensor.SensorName) ? "" : config.sensor.SensorName;
+            txtSensorType.Text = string.IsNullOrEmpty(config.sensorType.SensorTypeName) ? "" : config.sensorType.SensorTypeName;
+
 
             // Initialize OPC UA client
             opcClient = new OpcClient(opcServer);
@@ -53,8 +62,7 @@ namespace Scada_opc_client_DB_writer
             // Timer for updating every 1 second
             timer = new System.Windows.Forms.Timer();
             timer.Interval = 1000; // 1 second
-            timer.Tick += Timer_Tick;
-            timer.Start();
+            timer.Tick += Timer_Tick; // Attach event handler for timer tick
 
             // Cleanup on close
             FormClosing += Form1_FormClosing;
@@ -68,7 +76,7 @@ namespace Scada_opc_client_DB_writer
                 var processValue = Convert.ToDouble(node.Value);
                 var timestamp = node.SourceTimestamp;
 
-                lblTemp.Text = $"Temp: {processValue} °C at {timestamp:HH:mm:ss}";
+                lblTemp.Text = $"Temp: {processValue:F2} °C at {timestamp:HH:mm:ss}";
 
                 //Plot Data
                 Logger.Add(processValue);
@@ -80,73 +88,19 @@ namespace Scada_opc_client_DB_writer
             }
         }
 
-        private OpcClient opcConnect(string server)
-        {
-            OpcClient opcClient;
-            try
-            {
-                opcClient = new OpcClient(server);
-                opcClient.Connect();
-            }
-            catch (Exception ex)
-            {
-                //MessageBox.Show($"Failed to connect to OPC UA server: {ex.Message}");
-                opcClient = null;
-            }
-            return opcClient;
-        }
-
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             opcClient?.Disconnect();
         }
 
-        private void txtOpcServer_Leave(object sender, EventArgs e)
+        private void btnStart_Click(object sender, EventArgs e)
         {
-            opcServer = txtOpcServer.Text;
-
-            // Stop timer while reconnecting
-            timer?.Stop();
-
-            // Disconnect and dispose old client
-            if (opcClient != null)
-            {
-                try { opcClient.Disconnect(); } catch { }
-                opcClient.Dispose();
-                opcClient = null;
-            }
-
-            // Try to connect to new server
-            if (!string.IsNullOrWhiteSpace(opcServer))
-            {
-                opcClient = opcConnect(opcServer);
-                if (opcClient != null && opcClient.State == OpcClientState.Connected)
-                {
-                    lblTemp.Text = $"Connected to {opcServer}";
-                    timer?.Start();
-                }
-                else
-                {
-                    lblTemp.Text = $"Failed to connect to {opcServer}";
-                }
-            }
-            else
-            {
-                lblTemp.Text = "Please enter a valid OPC UA server address.";
-            }
-
-            // To clear the Logger:
-            Logger.Clear();
-            formsPlot1.Refresh();
+            timer.Start();
         }
-        private void txtTagName_Leave(object sender, EventArgs e)
-        {
-            tagName = txtTagName.Text;
-            lblTemp.Text = "The new tagName is " + tagName;
 
-            // To clear the Logger:
-            Logger.Clear();
-            formsPlot1.Refresh();
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            timer.Stop();
         }
     }
 }
