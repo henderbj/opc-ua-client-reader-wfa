@@ -63,7 +63,7 @@
             txtVariableDescription = new TextBox();
             groupBoxSensorType = new GroupBox();
             label12 = new Label();
-            txtTypeName = new TextBox();
+            txtSensorTypeName = new TextBox();
             label14 = new Label();
             txtSensorTypeDescription = new TextBox();
             groupBoxSensor = new GroupBox();
@@ -390,7 +390,7 @@
             // groupBoxSensorType
             // 
             groupBoxSensorType.Controls.Add(label12);
-            groupBoxSensorType.Controls.Add(txtTypeName);
+            groupBoxSensorType.Controls.Add(txtSensorTypeName);
             groupBoxSensorType.Controls.Add(label14);
             groupBoxSensorType.Controls.Add(txtSensorTypeDescription);
             groupBoxSensorType.Location = new Point(28, 437);
@@ -409,12 +409,12 @@
             label12.TabIndex = 0;
             label12.Text = "Type Name:";
             // 
-            // txtTypeName
+            // txtSensorTypeName
             // 
-            txtTypeName.Location = new Point(148, 30);
-            txtTypeName.Name = "txtTypeName";
-            txtTypeName.Size = new Size(222, 27);
-            txtTypeName.TabIndex = 1;
+            txtSensorTypeName.Location = new Point(148, 30);
+            txtSensorTypeName.Name = "txtSensorTypeName";
+            txtSensorTypeName.Size = new Size(222, 27);
+            txtSensorTypeName.TabIndex = 1;
             // 
             // label14
             // 
@@ -736,7 +736,7 @@
         private TextBox txtVariableDescription;
         private GroupBox groupBoxSensorType;
         private Label label12;
-        private TextBox txtTypeName;
+        private TextBox txtSensorTypeName;
         private Label label14;
         private TextBox txtSensorTypeDescription;
         private GroupBox groupBoxSensor;

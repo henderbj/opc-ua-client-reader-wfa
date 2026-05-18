@@ -34,7 +34,7 @@ namespace Scada_opc_client_DB_writer
         /// </summary>
         private void fillSensorTypeDetails()
         {
-            txtTypeName.Text = _sensorTypes[_sensorTypeSelected].SensorTypeName;
+            txtSensorTypeName.Text = _sensorTypes[_sensorTypeSelected].SensorTypeName;
             txtSensorTypeDescription.Text = _sensorTypes[_sensorTypeSelected].SensorTypeDescription;
         }
 

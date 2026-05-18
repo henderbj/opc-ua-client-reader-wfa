@@ -30,6 +30,8 @@ namespace Scada_opc_client_DB_writer
             processUnit = processUnit.FindOrCreate(txtProcessName.Text, txtProcessType.Text, txtProcessDescription.Text, location.LocationId);
             ProcessVariable processVariable = new ProcessVariable();
             processVariable = processVariable.FindOrCreate(processUnit.ProcessId, txtVariableName.Text, txtEngineeringUnit.Text, txtVariableDescription.Text);
+            SensorType sensorType = new SensorType();
+            sensorType = sensorType.FindOrCreate(txtSensorTypeName.Text, txtSensorTypeDescription.Text);
         }
     }
 }

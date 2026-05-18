@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Scada_opc_client_DB_writer;
+using System.Data;
 
 namespace Scada_opc_client_DB_writer.Classes
 {
@@ -30,6 +31,30 @@ namespace Scada_opc_client_DB_writer.Classes
                 }
             }
             return sensorTypeList;
+        }
+
+        public SensorType FindOrCreate(string SensorTypeName, string SensorTypeDescription)
+        {
+            SensorType sensorType = new SensorType();
+            SqlConnection con = new SqlConnection(connectionString);
+            SensorTypeName = SensorTypeName.Trim();
+            SensorTypeDescription = SensorTypeDescription.Trim();
+            var cmd = new SqlCommand("usp_FindOrCreateSensorType", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@SensorTypeName", SensorTypeName);
+            cmd.Parameters.AddWithValue("@SensorTypeDescription", SensorTypeDescription);
+            con.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr != null)
+            {
+                while (dr.Read())
+                {
+                    sensorType.SensorTypeId = Convert.ToInt32(dr["SensorTypeId"]);
+                    sensorType.SensorTypeName = dr["SensorTypeName"].ToString();
+                    sensorType.SensorTypeDescription = dr["SensorTypeDescription"].ToString();
+                }
+            }
+            return sensorType;
         }
     }
 }
