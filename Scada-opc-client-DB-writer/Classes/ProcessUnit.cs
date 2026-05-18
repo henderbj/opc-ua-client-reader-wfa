@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Scada_opc_client_DB_writer;
+using System.Data;
 
 namespace Scada_opc_client_DB_writer.Classes
 {
@@ -34,6 +35,35 @@ namespace Scada_opc_client_DB_writer.Classes
                 }
             }
             return processUnitList;
+        }
+
+        public ProcessUnit FindOrCreate(string ProcessName, string ProcessType, string? ProcessDescription, int LocationId)
+        {
+            ProcessUnit processUnit = new ProcessUnit();
+            SqlConnection con = new SqlConnection(connectionString);
+            ProcessName = ProcessName.Trim();
+            ProcessType = ProcessType.Trim();
+            ProcessDescription = ProcessDescription?.Trim();
+            var cmd = new SqlCommand("usp_FindOrCreateProcessUnit", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@ProcessName", ProcessName);
+            cmd.Parameters.AddWithValue("@ProcessType", ProcessType);
+            cmd.Parameters.AddWithValue("@ProcessDescription", ProcessDescription ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@LocationId", LocationId);
+            con.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr != null)
+            {
+                while (dr.Read())
+                {
+                    processUnit.ProcessId = Convert.ToInt32(dr["ProcessId"]);
+                    processUnit.ProcessName = dr["ProcessName"].ToString();
+                    processUnit.ProcessType = dr["ProcessType"].ToString();
+                    processUnit.ProcessDescription = dr["ProcessDescription"].ToString();
+                    processUnit.LocationId = Convert.ToInt32(dr["LocationId"]);
+                }
+            }
+            return processUnit;
         }
     }
 }

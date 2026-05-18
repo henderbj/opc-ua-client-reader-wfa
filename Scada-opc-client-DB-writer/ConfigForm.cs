@@ -26,6 +26,8 @@ namespace Scada_opc_client_DB_writer
         {
             Location location = new Location();
             location = location.FindOrCreate(txtLocationName.Text, txtBuilding.Text, Convert.ToInt32(txtFloor.Text), txtRoom.Text);
+            ProcessUnit processUnit = new ProcessUnit();
+            processUnit = processUnit.FindOrCreate(txtProcessName.Text, txtProcessType.Text, txtProcessDescription.Text, location.LocationId);
         }
     }
 }
