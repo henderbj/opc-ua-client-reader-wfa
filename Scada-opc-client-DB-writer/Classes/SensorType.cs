@@ -1,10 +1,9 @@
 ﻿using Microsoft.Data.SqlClient;
-using Scada_opc_client_DB_writer;
 using System.Data;
 
 namespace Scada_opc_client_DB_writer.Classes
 {
-    internal class SensorType
+    public class SensorType
     {
         public int SensorTypeId { get; set; }
         public string SensorTypeName { get; set; }

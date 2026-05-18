@@ -1,5 +1,6 @@
 using Microsoft.Data.SqlClient;
-using System.Xml.Linq;
+using System.Xml.Serialization;
+using Scada_opc_client_DB_writer.Classes;
 
 namespace Scada_opc_client_DB_writer
 {
@@ -11,17 +12,41 @@ namespace Scada_opc_client_DB_writer
 
         public static bool Exists() => File.Exists(ConfigFilePath);
 
-        public static (string opcServer, string tagName) Load()
+        public static ConfigData LoadConfig()
         {
             if (!Exists())
             {
-                return ("", "");
+                return null;
             }
-            var doc = XDocument.Load(ConfigFilePath);
-            var root = doc.Element("Config");
-            string opcServer = root.Element("OpcServer")?.Value ?? "";
-            string tagName = root.Element("TagName")?.Value ?? "";
-            return (opcServer, tagName);
+
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(ConfigData));
+                using (FileStream fs = new FileStream(ConfigFilePath, FileMode.Open))
+                {
+                    return (ConfigData)serializer.Deserialize(fs);
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public static void SaveConfig(ConfigData data)
+        {
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(ConfigData));
+                using (FileStream fs = new FileStream(ConfigFilePath, FileMode.Create))
+                {
+                    serializer.Serialize(fs, data);
+                }
+            }
+            catch (Exception)
+            {
+                // In a real application, we might want to log this error.
+            }
         }
     }
 }

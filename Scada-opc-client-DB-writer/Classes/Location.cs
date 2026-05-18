@@ -1,10 +1,9 @@
 ﻿using Microsoft.Data.SqlClient;
-using Scada_opc_client_DB_writer;
 using System.Data;
 
 namespace Scada_opc_client_DB_writer.Classes
 {
-    internal class Location
+    public class Location
     {
         public int LocationId { get; set; }
         public string LocationName { get; set; }

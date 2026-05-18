@@ -9,10 +9,10 @@ namespace Scada_opc_client_DB_writer
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            if (AppConfig.Exists())
+            var config = AppConfig.LoadConfig();
+            if (config != null)
             {
-                var (opcServer, tagName) = AppConfig.Load();
-                Application.Run(new Form1(opcServer, tagName));
+                Application.Run(new Form1(config));
             }
             else
             {

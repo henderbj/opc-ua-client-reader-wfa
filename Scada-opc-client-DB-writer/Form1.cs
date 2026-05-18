@@ -1,4 +1,5 @@
 using Opc.UaFx.Client;
+using Scada_opc_client_DB_writer.Classes;
 //using System.Timers;
 
 namespace Scada_opc_client_DB_writer
@@ -13,14 +14,14 @@ namespace Scada_opc_client_DB_writer
         private string tagName;
         private string opcServer;
         private System.Windows.Forms.Timer timer;
-        public Form1() : this(null, null) { }
+        public Form1() : this(null) { }
 
-        public Form1(string opcServer, string tagName)
+        public Form1(ConfigData config)
         {
             InitializeComponent();
 
-            this.tagName = string.IsNullOrEmpty(tagName) ? txtTagName.Text : tagName;
-            this.opcServer = string.IsNullOrEmpty(opcServer) ? txtOpcServer.Text : opcServer;
+            tagName = string.IsNullOrEmpty(config.tagName) ? "" : config.tagName;
+            opcServer = string.IsNullOrEmpty(config.opcServer) ? "" : config.opcServer;
 
             // create one logger and add them to the plot
             Logger = formsPlot1.Plot.Add.DataLogger();
@@ -29,8 +30,8 @@ namespace Scada_opc_client_DB_writer
             formsPlot1.Plot.XLabel("Sample number");
             formsPlot1.Refresh();
 
-            this.Text = "OPC UA Temperature Reader";
-            this.Size = new Size(700, 400);
+            Text = "OPC UA Temperature Reader";
+            Size = new Size(700, 400);
 
             // Label
             lblTemp = new Label
@@ -39,14 +40,14 @@ namespace Scada_opc_client_DB_writer
                 Size = new Size(600, 20),
                 Text = "Temperature: "
             };
-            this.Controls.Add(lblTemp);
+            Controls.Add(lblTemp);
 
             // Set textbox values if provided
-            txtTagName.Text = this.tagName;
-            txtOpcServer.Text = this.opcServer;
+            txtTagName.Text = tagName;
+            txtOpcServer.Text = opcServer;
 
             // Initialize OPC UA client
-            opcClient = new OpcClient(this.opcServer);
+            opcClient = new OpcClient(opcServer);
             opcClient.Connect();
 
             // Timer for updating every 1 second
@@ -56,7 +57,7 @@ namespace Scada_opc_client_DB_writer
             timer.Start();
 
             // Cleanup on close
-            this.FormClosing += Form1_FormClosing;
+            FormClosing += Form1_FormClosing;
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -118,7 +119,7 @@ namespace Scada_opc_client_DB_writer
             // Try to connect to new server
             if (!string.IsNullOrWhiteSpace(opcServer))
             {
-                opcClient = this.opcConnect(opcServer);
+                opcClient = opcConnect(opcServer);
                 if (opcClient != null && opcClient.State == OpcClientState.Connected)
                 {
                     lblTemp.Text = $"Connected to {opcServer}";
