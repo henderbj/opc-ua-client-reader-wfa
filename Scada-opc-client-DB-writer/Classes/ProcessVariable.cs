@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Scada_opc_client_DB_writer;
+using System.Data;
 
 namespace Scada_opc_client_DB_writer.Classes
 {
@@ -34,6 +35,35 @@ namespace Scada_opc_client_DB_writer.Classes
                 }
             }
             return processVariableList;
+        }
+
+        public ProcessVariable FindOrCreate(int ProcessId, string VariableName, string EngineeringUnit, string? VariableDescription)
+        {
+            ProcessVariable processVariable = new ProcessVariable();
+            SqlConnection con = new SqlConnection(connectionString);
+            VariableName = VariableName.Trim();
+            EngineeringUnit = EngineeringUnit.Trim();
+            VariableDescription = VariableDescription?.Trim();
+            var cmd = new SqlCommand("usp_FindOrCreateProcessVariable", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@ProcessId", ProcessId);
+            cmd.Parameters.AddWithValue("@VariableName", VariableName);
+            cmd.Parameters.AddWithValue("@EngineeringUnit", EngineeringUnit);
+            cmd.Parameters.AddWithValue("@VariableDescription", VariableDescription ?? (object)DBNull.Value);
+            con.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr != null)
+            {
+                while (dr.Read())
+                {
+                    processVariable.VariableId = Convert.ToInt32(dr["VariableId"]);
+                    processVariable.ProcessId = Convert.ToInt32(dr["ProcessId"]);
+                    processVariable.VariableName = dr["VariableName"].ToString();
+                    processVariable.EngineeringUnit = dr["EngineeringUnit"].ToString();
+                    processVariable.VariableDescription = dr["VariableDescription"].ToString();
+                }
+            }
+            return processVariable;
         }
     }
 }

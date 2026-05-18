@@ -1,6 +1,6 @@
 USE [master]
 GO
-/****** Object:  Database [SCADA]    Script Date: 18.05.2026 02:16:52 ******/
+/****** Object:  Database [SCADA]    Script Date: 18.05.2026 14:02:45 ******/
 CREATE DATABASE [SCADA]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -82,7 +82,7 @@ ALTER DATABASE [SCADA] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POL
 GO
 USE [SCADA]
 GO
-/****** Object:  Table [dbo].[Location]    Script Date: 18.05.2026 02:16:52 ******/
+/****** Object:  Table [dbo].[Location]    Script Date: 18.05.2026 14:02:45 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -109,7 +109,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ProcessUnit]    Script Date: 18.05.2026 02:16:52 ******/
+/****** Object:  Table [dbo].[ProcessUnit]    Script Date: 18.05.2026 14:02:45 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -126,7 +126,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ProcessVariable]    Script Date: 18.05.2026 02:16:52 ******/
+/****** Object:  Table [dbo].[ProcessVariable]    Script Date: 18.05.2026 14:02:45 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -147,7 +147,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Sensor]    Script Date: 18.05.2026 02:16:52 ******/
+/****** Object:  Table [dbo].[Sensor]    Script Date: 18.05.2026 14:02:45 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -167,7 +167,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SensorData]    Script Date: 18.05.2026 02:16:52 ******/
+/****** Object:  Table [dbo].[SensorData]    Script Date: 18.05.2026 14:02:45 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -183,7 +183,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SensorType]    Script Date: 18.05.2026 02:16:52 ******/
+/****** Object:  Table [dbo].[SensorType]    Script Date: 18.05.2026 14:02:45 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -208,7 +208,7 @@ REFERENCES [dbo].[ProcessUnit] ([ProcessID])
 GO
 ALTER TABLE [dbo].[ProcessVariable] CHECK CONSTRAINT [FK_ProcessVariable_ProcessUnit]
 GO
-/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateLocation]    Script Date: 18.05.2026 02:16:52 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateLocation]    Script Date: 18.05.2026 14:02:45 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -241,7 +241,7 @@ BEGIN
     OUTPUT inserted.*;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateProcessUnit]    Script Date: 18.05.2026 02:16:52 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateProcessUnit]    Script Date: 18.05.2026 14:02:45 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -272,6 +272,41 @@ BEGIN
     WHEN NOT MATCHED THEN
         INSERT (ProcessName, ProcessType, ProcessDescription, LocationID)
         VALUES (source.ProcessName, source.ProcessType, source.ProcessDescription, source.LocationID)
+    OUTPUT inserted.*;
+END
+GO
+/****** Object:  StoredProcedure [dbo].[usp_FindOrCreateProcessVariable]    Script Date: 18.05.2026 14:02:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+CREATE PROCEDURE [dbo].[usp_FindOrCreateProcessVariable]
+    @ProcessID   INT,
+    @VariableName VARCHAR(100),
+    @EngineeringUnit VARCHAR(20),
+    @VariableDescription VARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    MERGE INTO ProcessVariable AS target
+    USING (VALUES (@ProcessID, @VariableName, @EngineeringUnit, @VariableDescription))
+           AS source(ProcessID, VariableName, EngineeringUnit, VariableDescription)
+    ON target.ProcessID = source.ProcessID
+       AND target.VariableName = source.VariableName
+       AND target.EngineeringUnit = source.EngineeringUnit
+       AND target.VariableDescription = source.VariableDescription
+
+    WHEN MATCHED THEN
+        -- No-op update to force OUTPUT to return the existing row
+        UPDATE SET VariableName = target.VariableName
+
+    WHEN NOT MATCHED THEN
+        INSERT (VariableName, EngineeringUnit, VariableDescription, ProcessID)
+        VALUES (source.VariableName, source.EngineeringUnit, source.VariableDescription, source.ProcessID)
     OUTPUT inserted.*;
 END
 GO
