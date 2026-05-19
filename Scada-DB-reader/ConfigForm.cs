@@ -14,6 +14,8 @@ namespace Scada_DB_reader
         private Sensor _sensor;
         private SensorType _sensorType;
         private ProcessVariable _processVariable;
+        private ProcessUnit _processUnit;
+        private Location _location;
 
         public ConfigForm()
         {
@@ -34,6 +36,11 @@ namespace Scada_DB_reader
             fillSensorTypeDetails(_sensorType);
             _processVariable = new ProcessVariable().Find(_sensor.VariableId);
             fillProcessVariableDetails(_processVariable);
+            _processUnit = new ProcessUnit().Find(_processVariable.ProcessId);
+            fillProcessUnitDetails(_processUnit);
+            _location = new Location().Find(_processUnit.LocationId);
+            fillLocationDetails(_location);
+
         }
     }
 }

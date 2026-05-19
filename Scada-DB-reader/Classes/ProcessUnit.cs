@@ -64,5 +64,27 @@ namespace Scada_DB_reader.Classes
             }
             return processUnit;
         }
+
+        public ProcessUnit Find(int ProcessId)
+        {
+            ProcessUnit processUnit = new ProcessUnit();
+            SqlConnection con = new SqlConnection(connectionString);
+            var cmd = new SqlCommand("SELECT ProcessId, ProcessName, ProcessType, ProcessDescription, LocationId FROM dbo.ProcessUnit WHERE ProcessId = @ProcessId", con);
+            cmd.Parameters.AddWithValue("@ProcessId", ProcessId);
+            con.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr != null)
+            {
+                while (dr.Read())
+                {
+                    processUnit.ProcessId = Convert.ToInt32(dr["ProcessId"]);
+                    processUnit.ProcessName = dr["ProcessName"].ToString();
+                    processUnit.ProcessType = dr["ProcessType"].ToString();
+                    processUnit.ProcessDescription = dr["ProcessDescription"].ToString();
+                    processUnit.LocationId = Convert.ToInt32(dr["LocationId"]);
+                }
+            }
+            return processUnit;
+        }
     }
 }

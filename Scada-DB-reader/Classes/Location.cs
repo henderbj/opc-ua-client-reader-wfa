@@ -63,5 +63,27 @@ namespace Scada_DB_reader.Classes
             }
             return location;
         }
+
+        public Location Find(int LocationId)
+        {
+            Location location = new Location();
+            SqlConnection con = new SqlConnection(connectionString);
+            var cmd = new SqlCommand("SELECT LocationId, LocationName, Building, Floor, Room FROM dbo.Location WHERE LocationId = @LocationId", con);
+            cmd.Parameters.AddWithValue("@LocationId", LocationId);
+            con.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr != null)
+            {
+                while (dr.Read())
+                {
+                    location.LocationId = Convert.ToInt32(dr["LocationId"]);
+                    location.LocationName = dr["LocationName"].ToString();
+                    location.Building = dr["Building"].ToString();
+                    location.Floor = Convert.ToInt32(dr["Floor"]);
+                    location.Room = dr["Room"].ToString();
+                }
+            }
+            return location;
+        }
     }
 }
