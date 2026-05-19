@@ -47,6 +47,7 @@ namespace Scada_opc_client_DB_writer
             };
 
             AppConfig.SaveConfig(configData);
+            this.Close();
         }
     }
 }

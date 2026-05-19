@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             groupBox3 = new GroupBox();
             txtSensorType = new TextBox();
             label6 = new Label();
@@ -40,6 +41,7 @@
             txtLocation = new TextBox();
             label4 = new Label();
             formsPlot1 = new ScottPlot.WinForms.FormsPlot();
+            timer1 = new System.Windows.Forms.Timer(components);
             groupBox3.SuspendLayout();
             SuspendLayout();
             // 
@@ -154,6 +156,10 @@
             formsPlot1.Size = new Size(906, 289);
             formsPlot1.TabIndex = 25;
             // 
+            // timer1
+            // 
+            timer1.Tick += timer1_Tick;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -182,5 +188,6 @@
         private TextBox txtLocation;
         private Label label4;
         private ScottPlot.WinForms.FormsPlot formsPlot1;
+        private System.Windows.Forms.Timer timer1;
     }
 }

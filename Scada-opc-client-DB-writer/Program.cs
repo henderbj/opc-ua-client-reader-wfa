@@ -17,6 +17,8 @@ namespace Scada_opc_client_DB_writer
             else
             {
                 Application.Run(new ConfigForm());
+                config = AppConfig.LoadConfig();
+                Application.Run(new Form1(config));
             }
         }
     }

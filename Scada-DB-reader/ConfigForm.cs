@@ -42,5 +42,20 @@ namespace Scada_DB_reader
             fillLocationDetails(_location);
 
         }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            ConfigData configData = new ConfigData
+            {
+                location = _location,
+                processUnit = _processUnit,
+                processVariable = _processVariable,
+                sensorType = _sensorType,
+                sensor = _sensor
+            };
+
+            AppConfig.SaveConfig(configData);
+            this.Close();   // Close the form after saving
+        }
     }
 }

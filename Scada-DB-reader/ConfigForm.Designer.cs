@@ -283,7 +283,7 @@
             cmbSensor.Name = "cmbSensor";
             cmbSensor.Size = new Size(400, 28);
             cmbSensor.TabIndex = 71;
-            cmbSensor.SelectedIndexChanged += this.cmbSensor_SelectedIndexChanged;
+            cmbSensor.SelectedIndexChanged += cmbSensor_SelectedIndexChanged;
             // 
             // label16
             // 
@@ -481,6 +481,7 @@
             btnSave.TabIndex = 66;
             btnSave.Text = "Save";
             btnSave.UseVisualStyleBackColor = true;
+            btnSave.Click += btnSave_Click;
             // 
             // ConfigForm
             // 

@@ -34,6 +34,8 @@ namespace Scada_DB_reader
             else
             {
                 Application.Run(new ConfigForm());
+                config = AppConfig.LoadConfig();
+                Application.Run(new Form1(config));
             }
         }
     }

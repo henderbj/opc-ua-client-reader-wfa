@@ -37,5 +37,52 @@ namespace Scada_DB_reader.Classes
             }
             return sensorData;
         }
+
+        public List<SensorData> findAll(int sensorId)
+        {
+            List<SensorData> sensorDataList = new List<SensorData>();
+            SqlConnection con = new SqlConnection(connectionString);
+            var cmd = new SqlCommand("SELECT * FROM dbo.SensorData WHERE SensorId = @SensorId", con);
+            cmd.CommandType = CommandType.Text;
+            cmd.Parameters.AddWithValue("@SensorId", sensorId);
+            con.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr != null)
+            {
+                while (dr.Read())
+                {
+                    SensorData sensorData = new SensorData();
+                    sensorData.SensorId = Convert.ToInt32(dr["SensorId"]);
+                    sensorData.MeasuredValue = Convert.ToSingle(dr["MeasuredValue"]);
+                    sensorData.TimeStamp = Convert.ToDateTime(dr["TimeStamp"]);
+                    sensorDataList.Add(sensorData);
+                }
+            }
+            return sensorDataList   ;
+        }
+
+        public List<SensorData> findAllAfter(int sensorId, DateTime lastTime)
+        {
+            List<SensorData> sensorDataList = new List<SensorData>();
+            SqlConnection con = new SqlConnection(connectionString);
+            var cmd = new SqlCommand("SELECT * FROM dbo.SensorData WHERE SensorId = @SensorId AND TimeStamp > @LastTime", con);
+            cmd.CommandType = CommandType.Text;
+            cmd.Parameters.AddWithValue("@SensorId", sensorId);
+            cmd.Parameters.AddWithValue("@LastTime", lastTime);
+            con.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr != null)
+            {
+                while (dr.Read())
+                {
+                    SensorData sensorData = new SensorData();
+                    sensorData.SensorId = Convert.ToInt32(dr["SensorId"]);
+                    sensorData.MeasuredValue = Convert.ToSingle(dr["MeasuredValue"]);
+                    sensorData.TimeStamp = Convert.ToDateTime(dr["TimeStamp"]);
+                    sensorDataList.Add(sensorData);
+                }
+            }
+            return sensorDataList   ;
+        }
     }
 }
