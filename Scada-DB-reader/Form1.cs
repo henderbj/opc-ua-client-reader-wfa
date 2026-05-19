@@ -66,9 +66,9 @@ namespace Scada_DB_reader
         {
             // Fetch new data from the database for the specific sensor
             List<SensorData> sensorDataList = new SensorData().findAllAfter(sensorId, _lastTime);
-            AddDataToPlot(sensorDataList); // Add the new data points to the plot and update the last timestamp
             if (sensorDataList.Count > 0)
             {
+                AddDataToPlot(sensorDataList); // Add the new data points to the plot and update the last timestamp
                 _lblTemp.Text = $"Last update: {DateTime.Now}, Latest value: {sensorDataList.Last().MeasuredValue:F2} at {sensorDataList.Last().TimeStamp}";
             }
             formsPlot1.Refresh();
