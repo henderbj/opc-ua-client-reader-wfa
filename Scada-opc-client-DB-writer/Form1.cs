@@ -1,5 +1,8 @@
 using Opc.UaFx.Client;
 using Scada_opc_client_DB_writer.Classes;
+using System.Threading;
+using System.Threading.Channels;
+using System.Threading.Tasks;
 
 namespace Scada_opc_client_DB_writer
 {
@@ -14,6 +17,10 @@ namespace Scada_opc_client_DB_writer
         private string opcServer;
         private System.Windows.Forms.Timer timer;
         private int sensorId;
+
+        // Queue for database writes to ensure they are processed in order and without blocking the UI thread
+        private readonly Channel<SensorData> _dbQueue = Channel.CreateUnbounded<SensorData>();
+        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
         public Form1(ConfigData config)
         {
@@ -66,13 +73,15 @@ namespace Scada_opc_client_DB_writer
             timer.Interval = 1000; // 1 second
             timer.Tick += Timer_Tick; // Attach event handler for timer tick
 
+            // Start the background worker for DB writes
+            _ = ProcessDbQueueAsync(_cts.Token);
+
             // Cleanup on close
             FormClosing += Form1_FormClosing;
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            SensorData sensorData = new SensorData();
             try
             {
                 var node = opcClient.ReadNode(tagName);
@@ -85,8 +94,14 @@ namespace Scada_opc_client_DB_writer
                 Logger.Add(processValue);
                 formsPlot1.Refresh();
 
-                // Write to DB
-                sensorData.Insert(sensorId, (float)processValue, Convert.ToDateTime(timestamp));
+                // Write to DB asynchronously
+                var data = new SensorData
+                {
+                    SensorId = this.sensorId,
+                    MeasuredValue = (float)processValue,
+                    TimeStamp = Convert.ToDateTime(timestamp)
+                };
+                _dbQueue.Writer.TryWrite(data);
             }
             catch (Exception ex)
             {
@@ -94,8 +109,29 @@ namespace Scada_opc_client_DB_writer
             }
         }
 
+        private async Task ProcessDbQueueAsync(CancellationToken ct)
+        {
+            try
+            {
+                await foreach (var data in _dbQueue.Reader.ReadAllAsync(ct))
+                {
+                    try
+                    {
+                        // Use a new instance of SensorData to perform the insert
+                        new SensorData().Insert((int)data.SensorId, data.MeasuredValue, data.TimeStamp);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Database insert error: {ex.Message}");
+                    }
+                }
+            }
+            catch (OperationCanceledException) { }
+        }
+
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            _cts.Cancel();
             opcClient?.Disconnect();
         }
 
